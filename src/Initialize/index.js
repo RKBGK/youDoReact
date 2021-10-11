@@ -1,14 +1,21 @@
-import React, { useEffect } from 'react';
-import getTodos from '../api/data/todoData';
+import React, { useEffect, useState } from 'react';
+import { getTodos } from '../api/data/todoData';
+import Todo from '../components/Todo';
+import TodoForm from '../components/TodoForm';
 
 function Initialize() {
+  const [todos, setTodos] = useState([]);
+
   useEffect(() => {
-    getTodos.then(console.warn);
+    getTodos().then(setTodos);
   }, []);
 
   return (
     <>
-      <h1>Hello World!</h1>
+      <TodoForm />
+      {todos.map((todo) => (
+        <Todo key={todo.name} taco={todo} />
+      ))}
     </>
   );
 }
