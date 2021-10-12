@@ -5,7 +5,7 @@ const baseURL = firebaseConfig.databaseURL;
 
 const getTodos = () => new Promise((resolve, reject) => {
   axios
-    .get(`${baseURL}/todo.json`)
+    .get(`${baseURL}/todo.json?orderBy="complete"&equalTo=false`)
     .then((response) => resolve(Object.values(response.data)))
     .catch(reject);
 });
@@ -30,4 +30,13 @@ const deleteTodo = (firebaseKey) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
-export { getTodos, createTodo, deleteTodo };
+const updateTodo = (todoObj) => new Promise((resolve, reject) => {
+  axios
+    .patch(`${baseURL}/todo/${todoObj.firebaseKey}.json`, todoObj)
+    .then(() => getTodos().then(resolve))
+    .catch(reject);
+});
+
+export {
+  getTodos, createTodo, deleteTodo, updateTodo,
+};

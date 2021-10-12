@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { createTodo } from '../api/data/todoData';
+import { createTodo, updateTodo } from '../api/data/todoData';
 
 // Create an initial state object so that it can be reused in the component
 const initialState = {
@@ -8,7 +8,7 @@ const initialState = {
   complete: false,
   uid: '',
 };
-export default function TodoForm({ obj, setTodos }) {
+export default function TodoForm({ obj, setTodos, setEditItem }) {
   // set the default state to the initialState object
   const [formInput, setFormInput] = useState(initialState);
 
@@ -29,6 +29,7 @@ export default function TodoForm({ obj, setTodos }) {
   // On call of the resetForm function, reset the state to the initialState
   const resetForm = () => {
     setFormInput({ ...initialState });
+    setEditItem({});
   };
 
   const handleChange = (e) => {
@@ -43,6 +44,10 @@ export default function TodoForm({ obj, setTodos }) {
     e.preventDefault();
     if (obj.firebaseKey) {
       // update the todo
+      updateTodo(formInput).then((todos) => {
+        setTodos(todos);
+        resetForm();
+      });
     } else {
       createTodo({ ...formInput, date: new Date() }).then((todos) => {
         setTodos(todos);
@@ -57,19 +62,19 @@ export default function TodoForm({ obj, setTodos }) {
         <div className="mb-3 d-flex">
           <label htmlFor="name" className="form-label visually-hidden">
             Name
-            <input
-              className="form-control form-control-lg me-3"
-              type="text"
-              id="name"
-              name="name"
-              value={formInput.name}
-              onChange={handleChange}
-              placeholder="Enter A You Do!"
-              required
-            />
           </label>
+          <input
+            className="form-control form-control-lg me-1"
+            type="text"
+            id="name"
+            name="name"
+            value={formInput.name}
+            onChange={handleChange}
+            placeholder="Enter A You Do!"
+            required
+          />
           <button className="btn btn-success" type="submit">
-            Submit
+            {obj.firebaseKey ? 'Update' : 'Submit'}
           </button>
         </div>
       </form>
@@ -86,6 +91,7 @@ TodoForm.propTypes = {
     uid: PropTypes.string,
   }),
   setTodos: PropTypes.func.isRequired,
+  setEditItem: PropTypes.func.isRequired,
 };
 
 TodoForm.defaultProps = {
