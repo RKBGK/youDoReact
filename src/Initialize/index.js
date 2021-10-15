@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getTodos } from '../api/data/todoData';
-import Todo from '../components/Todo';
+// import Todo from '../components/Todo';
+import CategorizedTodos from '../components/CategorizedTodos';
 import TodoForm from '../components/TodoForm';
 
 const Container = styled.div`
@@ -15,6 +16,16 @@ const Container = styled.div`
     font-size: 64px;
     font-weight: 400;
   }
+
+  h3 {
+    color: lightgrey;
+    text-align: center;
+  }
+  h4 {
+    color: lightgrey;
+    text-transform: uppercase;
+    font-size: medium;
+  }
 `;
 
 function Initialize() {
@@ -23,13 +34,26 @@ function Initialize() {
   const [editItem, setEditItem] = useState({});
 
   useEffect(() => {
-    getTodos().then(setTodos);
+    getTodos().then((todoArray) => {
+      setTodos(todoArray);
+    });
   }, []);
 
   return (
     <Container>
       <TodoForm obj={editItem} setTodos={setTodos} setEditItem={setEditItem} />
-      {todos.map((todo) => (
+      <div className="mt-5">
+        {todos.length ? (
+          <CategorizedTodos
+            todos={todos}
+            setTodos={setTodos}
+            setEditItem={setEditItem}
+          />
+        ) : (
+          <h3>Add A YOU DO!</h3>
+        )}
+      </div>
+      {/* //{todos.map((todo) => (
         <Todo
           key={todo.firebaseKey}
           taco={todo}
@@ -38,7 +62,7 @@ function Initialize() {
         />
         // props are arguments - key, taco, setTodos
         // setTodos sets todos
-      ))}
+      ))} */}
     </Container>
   );
 }
