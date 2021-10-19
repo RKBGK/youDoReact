@@ -10,6 +10,20 @@ const getTodos = () => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const getCompletedTodos = () => new Promise((resolve, reject) => {
+  axios
+    .get(`${baseURL}/todo.json?orderBy="complete"&equalTo=true`)
+    .then((response) => resolve(Object.values(response.data)))
+    .catch(reject);
+});
+
+const getAllTodos = () => new Promise((resolve, reject) => {
+  axios
+    .get(`${baseURL}/todo.json`)
+    .then((response) => resolve(Object.values(response.data)))
+    .catch(reject);
+});
+
 const createTodo = (object) => new Promise((resolve, reject) => {
   axios
     .post(`${baseURL}/todo.json`, object)
@@ -30,6 +44,20 @@ const deleteTodo = (firebaseKey) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const deleteCompletedTodo = (firebaseKey) => new Promise((resolve, reject) => {
+  axios
+    .delete(`${baseURL}/todo/${firebaseKey}.json`)
+    .then(() => getTodos().then(resolve))
+    .catch(reject);
+});
+
+const deleteAllTodo = (firebaseKey) => new Promise((resolve, reject) => {
+  axios
+    .delete(`${baseURL}/todo/${firebaseKey}.json`)
+    .then(() => getTodos().then(resolve))
+    .catch(reject);
+});
+
 const updateTodo = (todoObj) => new Promise((resolve, reject) => {
   axios
     .patch(`${baseURL}/todo/${todoObj.firebaseKey}.json`, todoObj)
@@ -38,5 +66,12 @@ const updateTodo = (todoObj) => new Promise((resolve, reject) => {
 });
 
 export {
-  getTodos, createTodo, deleteTodo, updateTodo,
+  getTodos,
+  createTodo,
+  deleteTodo,
+  updateTodo,
+  deleteCompletedTodo,
+  getCompletedTodos,
+  getAllTodos,
+  deleteAllTodo,
 };

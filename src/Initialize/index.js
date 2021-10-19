@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import styled from 'styled-components';
 import { getTodos } from '../api/data/todoData';
-// import Todo from '../components/Todo';
-import CategorizedTodos from '../components/CategorizedTodos';
 import TodoForm from '../components/TodoForm';
+import Navigation from '../components/Navigation';
+import Routes from '../routes';
+import SignIn from '../views/SignIn';
 
 const Container = styled.div`
   width: 60%;
@@ -21,48 +24,48 @@ const Container = styled.div`
     color: lightgrey;
     text-align: center;
   }
-  h4 {
-    color: lightgrey;
-    text-transform: uppercase;
-    font-size: medium;
-  }
 `;
 
 function Initialize() {
   const [todos, setTodos] = useState([]);
-  // edit item to
   const [editItem, setEditItem] = useState({});
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    getTodos().then((todoArray) => {
-      setTodos(todoArray);
+    firebase.auth().onAuthStateChanged((authed) => {
+      if (authed) {
+        // something to happen
+        const userInfoObj = {
+          fullName: authed.displayName,
+          profileImage: authed.photoURL,
+          uid: authed.uid,
+          user: authed.email.split('@')[0],
+        };
+        setUser(userInfoObj);
+        // TODO: Refactor code for users to only see their todos
+        getTodos().then(setTodos);
+      } else if (user || user === null) {
+        setUser(false);
+      }
     });
   }, []);
 
   return (
     <Container>
-      <TodoForm obj={editItem} setTodos={setTodos} setEditItem={setEditItem} />
-      <div className="mt-5">
-        {todos.length ? (
-          <CategorizedTodos
-            todos={todos}
+      {user ? (
+        <>
+          <Navigation />
+          <h1>YOU DO</h1>
+          <TodoForm
+            obj={editItem}
             setTodos={setTodos}
             setEditItem={setEditItem}
           />
-        ) : (
-          <h3>Add A YOU DO!</h3>
-        )}
-      </div>
-      {/* //{todos.map((todo) => (
-        <Todo
-          key={todo.firebaseKey}
-          taco={todo}
-          setTodos={setTodos}
-          setEditItem={setEditItem}
-        />
-        // props are arguments - key, taco, setTodos
-        // setTodos sets todos
-      ))} */}
+          <Routes todos={todos} setTodos={setTodos} setEditItem={setEditItem} />
+        </>
+      ) : (
+        <SignIn user={user} />
+      )}
     </Container>
   );
 }
